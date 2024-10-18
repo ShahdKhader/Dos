@@ -11,6 +11,7 @@
   "description": "",
   "dependencies": {
     "csv-parser": "^3.0.0",
-    "express": "^4.21.1"
+    "express": "^4.21.1",
+    "json2csv": "^6.0.0-alpha.2"
   }
 }
