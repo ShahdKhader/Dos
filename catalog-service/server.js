@@ -72,5 +72,5 @@ app.post("/update-quantity/:item_number", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Catalog service is running on http://localhost:${port}`);
+  console.log(`Catalog service is running on http://catalog-service:${port}`);
 });
