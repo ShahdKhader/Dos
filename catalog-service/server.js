@@ -1,10 +1,7 @@
 const express = require("express");
 const fs = require("fs");
 const csv = require("csv-parser");
-const { parse } = require("json2csv");
-const { log } = require("console");
-const readCSVFile = require("./CRUD");
-const writeCSVFile = require("./CRUD");
+const { readCSVFile, writeCSVFile } = require("./CRUD");
 const app = express();
 const port = 3001;
 
@@ -47,32 +44,31 @@ app.get("/info/:item_number", (req, res) => {
     });
 });
 
-app.post("/update-quantity/:item_number", async (req, res) => {
+app.post("/update-quantity/:item_number", (req, res) => {
   const itemNumber = req.params.item_number;
-  try {
-    const response = await axios.get(
-      `http://localhost:3001/info/${itemNumber}`
-    );
-    const book = response.data;
-    console.log(book);
 
-    const books = await readCSVFile();
-    const bookToUpdate = books.find((b) => b.item_number === itemNumber);
+  readCSVFile()
+    .then((books) => {
+      const bookToUpdate = books.find((b) => b.item_number === itemNumber);
 
-    if (!bookToUpdate) {
-      return res.status(404).json({ message: "Book not found in CSV" });
-    }
+      if (!bookToUpdate) {
+        return res.status(404).json({ message: "Book not found in CSV" });
+      }
 
-    if (parseInt(bookToUpdate.quantity) > 0) {
-      bookToUpdate.quantity = parseInt(bookToUpdate.quantity) - 1;
-      await writeCSVFile(books);
-      res.json({ message: `Successfully purchased ${book.title}` });
-    } else {
-      res.status(400).json({ message: "Out of stock" });
-    }
-  } catch (err) {
-    res.status(404).json({ message: "Book not found" });
-  }
+      if (parseInt(bookToUpdate.quantity) > 0) {
+        bookToUpdate.quantity = parseInt(bookToUpdate.quantity) - 1;
+        return writeCSVFile(books).then(() => {
+          res.json({ message: `Successfully purchased ${bookToUpdate.title}` });
+        });
+      } else {
+        res.status(400).json({ message: "Out of stock" });
+      }
+    })
+    .catch((error) => {
+      res
+        .status(500)
+        .json({ message: "Error updating the CSV file", error: error.message });
+    });
 });
 
 app.listen(port, () => {

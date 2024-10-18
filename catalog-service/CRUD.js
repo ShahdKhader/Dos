@@ -1,6 +1,6 @@
 const fs = require("fs");
 const csv = require("csv-parser");
-
+const csvFilePath = "catalog.csv";
 const readCSVFile = () => {
   return new Promise((resolve, reject) => {
     const results = [];
@@ -27,7 +27,7 @@ const writeCSVFile = (data) => {
   });
 };
 
-exports = {
+module.exports = {
   readCSVFile,
   writeCSVFile,
 };

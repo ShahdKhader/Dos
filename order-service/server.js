@@ -6,7 +6,19 @@ const port = 3002;
 
 app.post("/purchase/:item_number", (req, res) => {
   const itemNumber = req.params.item_number;
-  axios.post(`http://localhost:3001/update-quantity/${itemNumber}`);
+
+  axios
+    .post(`http://localhost:3001/update-quantity/${itemNumber}`)
+    .then((response) => {
+      res.json({
+        message: `Purchase request processed for book ${itemNumber}`,
+      });
+    })
+    .catch((error) => {
+      res
+        .status(500)
+        .json({ message: "Error processing purchase", error: error.message });
+    });
 });
 
 app.listen(port, () => {
