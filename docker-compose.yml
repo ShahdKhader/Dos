@@ -1,0 +1,42 @@
+version: "3"
+services:
+  catalog-service:
+    image: catalog-service
+    container_name: catalog-service
+    build:
+      context: ./catalog-service  
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./catalog-service/catalog.csv:/app/catalog.csv  
+    networks:
+      - network1
+
+  order-service:
+    image: order-service
+    container_name: order-service
+    build:
+      context: ./order-service  
+    ports:
+      - "3002:3002"
+    networks:
+      - network1
+    depends_on:
+      - catalog-service  
+
+  frontend-service:
+    image: frontend-service
+    container_name: frontend-service
+    build:
+      context: ./frontend  
+    networks:
+      - network1
+    depends_on:
+      - order-service 
+      - catalog-service  
+    stdin_open: true
+    tty: true 
+
+networks:
+  network1:
+    driver: bridge
