@@ -96,6 +96,7 @@ function searchBooks(topic) {
   axios
     .get(`${catalogServer}/search/${topic}`)
     .then((response) => {
+      console.log("cache miss...");
       console.log("Books found:");
       console.table(response.data);
       setCache(cacheKey, response.data);

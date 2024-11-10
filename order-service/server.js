@@ -8,7 +8,7 @@ app.post("/purchase/:item_number", (req, res) => {
   const itemNumber = req.params.item_number;
 
   axios
-    .post(`http://catalog-service:3001/update-quantity/${itemNumber}`)
+    .post(`http://localhost:3001/update-quantity/${itemNumber}`)
     .then((response) => {
       res.json({
         message: `Purchase request processed for book ${itemNumber}`,
