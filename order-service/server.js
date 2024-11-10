@@ -2,7 +2,7 @@ const express = require("express");
 const axios = require("axios");
 
 const app = express();
-const port = 3002;
+const port = process.argv[2] || 3002;
 
 app.post("/purchase/:item_number", (req, res) => {
   const itemNumber = req.params.item_number;
