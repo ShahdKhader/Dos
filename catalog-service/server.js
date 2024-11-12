@@ -3,7 +3,7 @@ const fs = require("fs");
 const csv = require("csv-parser");
 const { readCSVFile, writeCSVFile } = require("./CRUD");
 const app = express();
-const port = process.argv[2] || 3001;
+const port = process.env.PORT || 3001 ;
 
 // Search by topic
 app.get("/search/:topic", (req, res) => {

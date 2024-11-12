@@ -8,14 +8,8 @@ const rl = readline.createInterface({
 
 const cache = {};
 
-const catalogReplicas = [
-  "http://localhost:3001",
-  "http://localhost:3002",
-];
-const orderReplicas = [
-  "http://localhost:3003",
-  "http://localhost:3004",
-];
+const catalogReplicas = ["http://catalog-service-1:3001", "http://catalog-service-2:3002"];
+const orderReplicas = ["http://order-service-1:3003", "http://order-service-2:3004"];
 
 let catalogReplicaIndex = 0;
 let orderReplicaIndex = 0;
@@ -46,10 +40,7 @@ function showMenu() {
 function handleUserInput(option) {
   switch (option) {
     case "1":
-      rl.question(
-        "Enter the topic : ",
-        searchBooks
-      );
+      rl.question("Enter the topic : ", searchBooks);
       break;
     case "2":
       rl.question("Enter the item number of the book: ", getBookInfo);
@@ -101,10 +92,11 @@ function searchBooks(topic) {
   }
 
   const catalogServer = getNextCatalogReplica();
-  
+
   axios
     .get(`${catalogServer}/search/${topic}`)
     .then((response) => {
+      console.log("cache miss...");
       console.log("Books found:");
       console.table(response.data);
       setCache(cacheKey, response.data);
@@ -128,7 +120,7 @@ function getBookInfo(itemNumber) {
   }
 
   const catalogServer = getNextCatalogReplica();
-  
+
   axios
     .get(`${catalogServer}/info/${itemNumber}`)
     .then((response) => {
@@ -145,7 +137,7 @@ function getBookInfo(itemNumber) {
 
 function purchaseBook(itemNumber) {
   const orderServer = getNextOrderReplica();
-  
+
   axios
     .post(`${orderServer}/purchase/${itemNumber}`)
     .then((response) => {
@@ -153,12 +145,12 @@ function purchaseBook(itemNumber) {
       const cacheKey = `info:${itemNumber}`;
       invalidateCache(cacheKey);
 
-      axios.get(`http://localhost:3001/info/${itemNumber}`).then((response) => {
+      const catalogServer = getNextCatalogReplica();
+      axios.get(`${catalogServer}/info/${itemNumber}`).then((response) => {
         const topic = response.data.topic;
         const searchCacheKey = `search:${topic}`;
         invalidateCache(searchCacheKey);
       });
-
       showMenu();
     })
     .catch((err) => {
